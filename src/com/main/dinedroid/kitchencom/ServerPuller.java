@@ -7,6 +7,8 @@ import java.io.ObjectInputStream.GetField;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import com.main.dinedroid.kitchen.KitchenController;
 import com.main.dinedroid.kitchen.main;
 import com.main.dinedroid.menu.Menu;
@@ -29,35 +31,51 @@ public class ServerPuller extends Thread {
 
 	public void run(){
 		switch(command){
-		case GET_MENU:  try {
-							mySocket = new Socket("",4322);
-							out = new ObjectOutputStream(mySocket.getOutputStream());
-							out.writeObject("Kitchen||Get_Menu");
-							in = new ObjectInputStream(mySocket.getInputStream());
-							Menu menu = (Menu)in.readObject();
-							kc.setMenu(menu);
-							out.close();
-							mySocket.close();
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} 
-							
-						break;
-		case GET_ORDERS: try {
-							mySocket = new Socket("",4322);
-							out = new ObjectOutputStream(mySocket.getOutputStream());
-							out.writeObject("Kitchen||Get_All_Tables");
-							in = new ObjectInputStream(mySocket.getInputStream());
-							ArrayList<Table> tables = (ArrayList<Table>)in.readObject();
-							kc.setTables(tables);
-							out.close();
-							mySocket.close();
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+		case GET_MENU:  
+			try {
+				mySocket = new Socket("",4322);
+				out = new ObjectOutputStream(mySocket.getOutputStream());
+				out.writeObject("Menu||Get_Menu");
+				in = new ObjectInputStream(mySocket.getInputStream());
+				Menu menu = (Menu)in.readObject();
+				kc.setMenu(menu);
+				out.close();
+				mySocket.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				showMessage("Error: Cannot communicate with the server");
+				e.printStackTrace();
+			} 
+			break;
+		case GET_ORDERS: 
+			try {
+				mySocket = new Socket("",4322);
+				out = new ObjectOutputStream(mySocket.getOutputStream());
+				out.writeObject("Table||Get_All_Tables");
+				in = new ObjectInputStream(mySocket.getInputStream());
+				ArrayList<Table> tables = (ArrayList<Table>)in.readObject();
+				kc.setTables(tables);
+				out.close();
+				mySocket.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				showMessage("Error: Cannot communicate with the server");
+				e.printStackTrace();
 			} 	
+			break;
 		}
 	}
 
+	public void showMessage(final String message)
+	{
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				JOptionPane.showMessageDialog(null, message);
+			}
+		});
+		t.run();
+	}
 }
