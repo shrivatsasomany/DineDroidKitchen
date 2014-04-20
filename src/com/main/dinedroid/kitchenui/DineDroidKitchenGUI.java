@@ -1,28 +1,30 @@
 package com.main.dinedroid.kitchenui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import com.main.dinedroid.swing.CascadingJFrame;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JScrollPane;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
-import javax.swing.JTextPane;
-import javax.swing.JRadioButton;
 import javax.swing.JList;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import com.main.dinedroid.kitchen.KitchenController;
+import com.main.dinedroid.kitchen.main;
+import com.main.dinedroid.models.Table;
+import com.main.dinedroid.models.Waiter;
+import com.main.dinedroid.swing.CascadingJFrame;
 
 public class DineDroidKitchenGUI extends CascadingJFrame {
 
@@ -35,7 +37,7 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 	private JLabel lblNewLabel;
 	private JLabel orderInfoTitle;
 	private JLabel lblStatus;
-	private JList orderList;
+	private JList orderJList;
 	private JTextPane orderInfoTextPane;
 	private JMenuBar menuBar;
 	private JMenu mnSettings;
@@ -44,11 +46,14 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 	private JMenuItem mntmRefreshMenu;
 	private JMenuItem mntmSetServerAddress;
 
+	private KitchenController kc;
+
 	/**
 	 * Create the frame.
 	 */
-	public DineDroidKitchenGUI() {
+	public DineDroidKitchenGUI(KitchenController kc) {
 		super("DineDroid Kitchen");
+		this.kc = kc;
 		setResizable(false);
 		setFont(new Font("Helvetica Neue", Font.PLAIN, 12));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -76,7 +81,7 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 		JScrollPane orderScrollPane = new JScrollPane();
 		orderScrollPane.setBounds(6, 32, 116, 255);
 		order_panel.add(orderScrollPane);
-		orderScrollPane.setViewportView(getOrderList());
+		orderScrollPane.setViewportView(getOrderJList());
 
 		JScrollPane orderInfoScrollPane = new JScrollPane();
 		orderInfoScrollPane.setBounds(126, 32, 257, 255);
@@ -91,6 +96,8 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 		tabbedPane.addTab("Menu", null, menu_panel, null);
 		menu_panel.setLayout(null);
 		menu_panel.add(getScrollPane());
+
+		initialize();
 	}
 
 	private JScrollPane getScrollPane() {
@@ -170,12 +177,12 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 		return lblStatus;
 	}
 
-	private JList getOrderList() {
-		if (orderList == null) {
-			orderList = new JList();
-			orderList.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
+	private JList getOrderJList() {
+		if (orderJList == null) {
+			orderJList = new JList();
+			orderJList.setFont(new Font("Helvetica Neue", Font.PLAIN, 13));
 		}
-		return orderList;
+		return orderJList;
 	}
 
 	private JTextPane getOrderInfoTextPane() {
@@ -244,5 +251,23 @@ public class DineDroidKitchenGUI extends CascadingJFrame {
 			});
 		}
 		return mntmSetServerAddress;
+	}
+
+	public void initialize() {
+		refreshOrderList();
+		// Refresh Menu
+	}
+
+	public void refreshOrderList() {
+		ArrayList<Table> jListCategories = new ArrayList<Table>();
+		for (Table w : kc.getTables()) {
+			jListCategories.add(w);
+		}
+		int get = jListCategories.size();
+		final Table[] temp1 = new Table[get];
+		for (int i = 0; i < get; ++i) {
+			temp1[i] = jListCategories.get(i);
+		}
+		orderJList.setListData(temp1);
 	}
 }
